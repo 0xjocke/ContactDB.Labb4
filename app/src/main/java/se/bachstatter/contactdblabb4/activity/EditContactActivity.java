@@ -1,7 +1,6 @@
 package se.bachstatter.contactdblabb4.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,8 +11,6 @@ import se.bachstatter.contactdblabb4.data.ContactDbHelper;
 import se.bachstatter.contactdblabb4.models.Contact;
 
 import static se.bachstatter.contactdblabb4.activity.ContactDetailActivity.EDIT_CONTACT_REQUEST_CODE;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_CODE;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_POSITION_CODE;
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.NEW_CONTACT_REQUEST_CODE;
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.REQUEST_CODE;
 
@@ -26,8 +23,6 @@ public class EditContactActivity extends Activity implements View.OnClickListene
     private EditText ageEditText;
     private EditText descriptionEditText;
     private EditText imgUrlEditText;
-    private Button editContactBtn;
-    private Button addContactBtn;
     private Contact contact;
     private int contactId;
     ContactDbHelper mDbHelper;
@@ -69,7 +64,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
      * Find add btn, set it visible and add onClickListener
      */
     private void setAddBtnListener() {
-        addContactBtn = (Button) findViewById(R.id.addContactBtn);
+        Button addContactBtn = (Button) findViewById(R.id.addContactBtn);
         addContactBtn.setVisibility(View.VISIBLE);
         addContactBtn.setOnClickListener(this);
     }
@@ -77,7 +72,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
      * Find edit btn, set it visible and add onClickListener
      */
     private void setEditBtnListener() {
-        editContactBtn = (Button) findViewById(R.id.editContactBtn);
+        Button editContactBtn = (Button) findViewById(R.id.editContactBtn);
         editContactBtn.setVisibility(View.VISIBLE);
         editContactBtn.setOnClickListener(this);
     }

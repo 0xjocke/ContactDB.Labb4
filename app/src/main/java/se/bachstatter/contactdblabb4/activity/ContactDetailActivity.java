@@ -13,13 +13,9 @@ import se.bachstatter.contactdblabb4.R;
 import se.bachstatter.contactdblabb4.data.ContactDbHelper;
 import se.bachstatter.contactdblabb4.fragments.ContactDetailFragment;
 
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.*;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_CODE;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_POSITION_CODE;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.EDIT_CODE;
+import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_ID_CODE;
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.LANDSCAPE_CODE;
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.MODE_CODE;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.REMOVE_CODE;
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.REQUEST_CODE;
 
 /**
@@ -58,7 +54,6 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
                 == Configuration.ORIENTATION_LANDSCAPE) {
             Intent landscapeIntent = getIntent();
             landscapeIntent.putExtra(MODE_CODE, LANDSCAPE_CODE);
-            landscapeIntent.putExtra(CONTACT_POSITION_CODE, getIntent().getIntExtra(CONTACT_POSITION_CODE, 0));
             landscapeIntent.putExtra(CONTACT_ID_CODE, getIntent().getIntExtra(CONTACT_ID_CODE, 0));
             setResult(RESULT_OK, landscapeIntent);
             finish();
@@ -67,7 +62,6 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
 
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
-            arguments.putInt(CONTACT_POSITION_CODE, getIntent().getIntExtra(CONTACT_POSITION_CODE, 0));
             arguments.putInt(CONTACT_ID_CODE, getIntent().getIntExtra(CONTACT_ID_CODE, 0));
             ContactDetailFragment fragment = new ContactDetailFragment();
             fragment.setArguments(arguments);
@@ -125,10 +119,10 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
     }
 
     /**
-     *If user clicked on positive button create a goToMainIntent.
-     * Send CONTACT_POSITION_CODE with putExtra
-     * also Send MODE_CODE REMOVE_CODE
-     * SetResult to OK and finish
+     * If user clicks ok/positive btn delete the contact
+     * SetResult to OK and finish / go to list view.
+     *
+     * On both postivie and negative btn click, dismiss the dialog.
      *
      * @param dialog
      * @param which
@@ -136,8 +130,8 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            ContactDbHelper mDbHelper = new ContactDbHelper(this);
-            mDbHelper.delete(getIntent().getIntExtra(CONTACT_ID_CODE, 0));
+            ContactDbHelper contactDbHelper = new ContactDbHelper(this);
+            contactDbHelper.delete(getIntent().getIntExtra(CONTACT_ID_CODE, 0));
             setResult(RESULT_OK, getIntent());
             finish();
         }
@@ -146,10 +140,7 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
 
     /**
      * If requestcode is EDIT_CONTACT_REQUEST_CODE and RESULT_OK
-     * create a goToMainIntent. Send CONTACT_POSITION_CODE with putExtra
-     * Send chosen contact with string CONTACT_CODE
-     * also Send MODE_CODE REMOVE_CODE
-     * SetResult to OK and finish
+     * SetResult to OK and finish/ go to list view.
      *
      * @param requestCode
      * @param resultCode
@@ -158,11 +149,6 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == EDIT_CONTACT_REQUEST_CODE){
             if(RESULT_OK == resultCode){
-//                Intent goToMainIntent = getIntent();
-//                int contactPositionInList = goToMainIntent.getIntExtra(CONTACT_POSITION_CODE, 0);
-//                goToMainIntent.putExtra(CONTACT_POSITION_CODE, contactPositionInList);
-//                goToMainIntent.putExtra(CONTACT_CODE, data.getParcelableExtra(CONTACT_CODE) );
-//                goToMainIntent.putExtra(MODE_CODE, EDIT_CODE);
                 setResult(RESULT_OK, getIntent());
                 finish();
             }

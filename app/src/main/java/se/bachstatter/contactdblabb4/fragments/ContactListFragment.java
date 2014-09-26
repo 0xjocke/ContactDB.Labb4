@@ -18,13 +18,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import se.bachstatter.contactdblabb4.R;
-import se.bachstatter.contactdblabb4.activity.ContactListActivity;
 import se.bachstatter.contactdblabb4.adapters.ContactAdapter;
 import se.bachstatter.contactdblabb4.data.ContactDbHelper;
 import se.bachstatter.contactdblabb4.models.Contact;
 
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.*;
-import static se.bachstatter.contactdblabb4.activity.ContactListActivity.CONTACT_POSITION_CODE;
 
 public class ContactListFragment extends ListFragment implements AdapterView.OnItemLongClickListener, DialogInterface.OnClickListener {
     ContactDbHelper mDbHelper;
@@ -32,17 +30,15 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     public ContactAdapter contactAdapter;
     private static final int FIRST_ITEM = 0;
     private Callbacks mCallbacks;
-    private int mActivatedPosition = ListView.INVALID_POSITION;
-    private int mActivatedId = ListView.INVALID_POSITION;
-    int currentPosForDialog;
     int currentIdForDialog;
+    int mActivatedId = ListView.NO_ID;
 
     /**
      * Create an interface that will be used to call parent activity
      * OnItemSelected with teh chosen position.
      */
     public interface Callbacks {
-        public void onItemSelected(int position, int id);
+        public void onItemSelected(int id);
     }
 
     /**
@@ -58,9 +54,6 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDbHelper = new ContactDbHelper(getActivity());
-       // mDbHelper.insert(new Contact("http://developer.fortnox.se/wp-content/uploads/2014/03/nakleh_jocke.jpg", "Jocke", "trevligt typ", 25));
-       // mDbHelper.insert(new Contact("https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xpa1/v/t1.0-9/10325400_10152110180717896_2268770918259889556_n.jpg?oh=f56b8b4f0425573484f23f30f441f7fc&oe=5496A104&__gda__=1418816786_2ff62edef154eb1e3df7b0f23bacfe13", "Linn Sandström", "En snäll pys", 25));
-       // mDbHelper.insert(new Contact("http://developer.fortnox.se/wp-content/uploads/2014/03/nakleh_jocke.jpg", "Jocke", "trevligt typ", 25));
         contactCursor = mDbHelper.get();
         contactAdapter = new ContactAdapter(getActivity(), contactCursor, false);
         setListAdapter(contactAdapter);
@@ -70,9 +63,8 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     /**
      * If savedInstance is null and we are in landscape: show first item
      *
-     * if savedInstance is null and it containsKey STATE_ACTIVATED_POSITION:
-     * setActivatedPosition to STATE_ACTIVATED_POSITION
-     * run setLongClickListener
+     * if savedInstance is null and it containsKey CONTACT_ID_CODE:
+     * run setActivatedPosition  CONTACT_ID_CODE
      *
      * @param view
      * @param savedInstanceState
@@ -80,21 +72,9 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-   //     View detailsFrame = getActivity().findViewById(R.id.contact_detail_container);
-//         TODO show first item on start.
-//        if (savedInstanceState == null &&  getResources().getConfiguration().orientation
-//                == Configuration.ORIENTATION_LANDSCAPE){
-//            mActivatedPosition = FIRST_ITEM;
-//            mCallbacks.onItemSelected(FIRST_ITEM,);
-
-
-//        }
-
         setLongClickListener();
-        if (savedInstanceState != null && savedInstanceState.containsKey(CONTACT_ID_CODE) &&
-                savedInstanceState.containsKey(CONTACT_POSITION_CODE)  ) {
-            setActivatedPosition(savedInstanceState.getInt(CONTACT_POSITION_CODE), savedInstanceState
-                    .getInt(CONTACT_ID_CODE));
+        if (savedInstanceState != null && savedInstanceState.containsKey(CONTACT_ID_CODE)) {
+            setActivatedPosition(savedInstanceState.getInt(CONTACT_ID_CODE));
         }
     }
 
@@ -160,9 +140,8 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     public void onListItemClick(ListView listView, View view, int position,
                                 long id) {
         super.onListItemClick(listView, view, position, id);
-        mActivatedPosition = position;
         mActivatedId = (int)id;
-        mCallbacks.onItemSelected(position,(int)id);
+        mCallbacks.onItemSelected((int)id);
     }
 
     /**
@@ -172,34 +151,21 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
      */
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mActivatedPosition != ListView.INVALID_POSITION) {
-            outState.putInt(CONTACT_POSITION_CODE, mActivatedPosition);
-            outState.putInt(CONTACT_ID_CODE, mActivatedPosition);
+        if (mActivatedId != ListView.NO_ID) {
+            outState.putInt(CONTACT_ID_CODE, mActivatedId);
         }
         super.onSaveInstanceState(outState);
 
     }
 
     /**
-     * This sets the choicemode to CHOICE_MODE_SINGLE.
-     * By setting the choiceMode to CHOICE_MODE_SINGLE, the
-     * List allows up to one item to  be in a chosen state
-     * we also call the parents activities onItemSelected and send it 0 so that the first
-     * item shows when we startup the app.
-     *
-     */
-    public void setActivateOnItemClick(int position) {
-        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    }
-
-    /**
      * Sets the checked state of ListView the specified position.
      * Also saves teh position to mActivatedPosition
-     * @param position
+     * @param id
      */
-    private void setActivatedPosition(int position, int id) {
-        getListView().setItemChecked(position, true);
-        mActivatedPosition = position;
+    private void setActivatedPosition(int id) {
+       //TODO might need position here
+       // getListView().setItemChecked(position, true);
         mActivatedId = id;
     }
 
@@ -219,7 +185,6 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            //TODO remove from cursor
             mDbHelper.delete(currentIdForDialog);
             contactCursor = mDbHelper.get();
             contactAdapter.changeCursor(contactCursor);
@@ -227,7 +192,4 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
         }
         dialog.dismiss();
     }
-
-
-
 }

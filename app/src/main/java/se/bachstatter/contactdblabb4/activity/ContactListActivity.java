@@ -2,19 +2,15 @@ package se.bachstatter.contactdblabb4.activity;
 
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import javax.xml.transform.Transformer;
-
 import se.bachstatter.contactdblabb4.R;
 import se.bachstatter.contactdblabb4.data.ContactDbHelper;
 import se.bachstatter.contactdblabb4.fragments.ContactDetailFragment;
 import se.bachstatter.contactdblabb4.fragments.ContactListFragment;
-import se.bachstatter.contactdblabb4.models.Contact;
 
 public class ContactListActivity extends Activity implements
         ContactListFragment.Callbacks {
@@ -22,18 +18,15 @@ public class ContactListActivity extends Activity implements
      * Variable for checking if two pane layout is active.
      */
     private boolean mTwoPane;
+
     /**
      * Request and Code Constants
      */
-    public static final String CONTACT_POSITION_CODE = "item_position";
     public static final String CONTACT_ID_CODE = "id" ;
     public static final String MODE_CODE = "mode";
     public static String REQUEST_CODE = "requestCode";
-    public static String CONTACT_CODE = "contact";
     public static final int NEW_CONTACT_REQUEST_CODE = 123 ;
     private static final int DETAIL_REQUEST_CODE = 234;
-    public static final int REMOVE_CODE = 999;
-    public static final int EDIT_CODE = 998;
     public static final int LANDSCAPE_CODE = 857;
 
 
@@ -59,29 +52,27 @@ public class ContactListActivity extends Activity implements
      *
      * if mTwoPane is true:
      * Create new Bundle named arguments,
-     * save the position with putString
+     * save the id with putString
      * Create a new DetailFragment and call setArgument with the bundle.
      * Then call fragmentmanager, begintransaction and replace.
-     * We call replace cause we want to show the current position.
+     * We call replace cause we want to show the current id.
      * And finally call commit()
      *
      * Else create a new detailIntent
-     * and send position with put extra
+     * and send id with put extra
      *
-     * @param position
+     * @param id
      */
-    public void onItemSelected(int position, int id) {
+    public void onItemSelected(int id) {
         if (mTwoPane) {
             Bundle arguments = new Bundle();
-            arguments.putInt(CONTACT_POSITION_CODE, position);
             arguments.putInt(CONTACT_ID_CODE, id);
             ContactDetailFragment fragment = new ContactDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
-                    .replace(R.id.contact_detail_container, fragment).setTransition(FragmentTransaction.TRANSIT_EXIT_MASK).commit();
+                    .replace(R.id.contact_detail_container, fragment).commit();
         } else {
             Intent detailIntent = new Intent(this, ContactDetailActivity.class);
-            detailIntent.putExtra(CONTACT_POSITION_CODE, position);
             detailIntent.putExtra(CONTACT_ID_CODE, id);
             startActivityForResult(detailIntent, DETAIL_REQUEST_CODE);
         }
@@ -102,35 +93,35 @@ public class ContactListActivity extends Activity implements
      * If user clicks on add contact start a new EditContactActivity
      * Send requestCode NEW_CONTACT_REQUEST_CODE with put extra.
      * and startActivityForResult.
+     *
+     * If user clicks on sortName btn run toggleSorting on our dbHelper
+     * check is we are in twoPane mode. run update list on with the
+     * help of thefragment manager on the shown fragment.
      * @param item
      * @return
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.addContact) {
-            Intent addContactIntent = new Intent(this, EditContactActivity.class);
-            addContactIntent.putExtra(REQUEST_CODE, NEW_CONTACT_REQUEST_CODE);
-            startActivityForResult(addContactIntent, NEW_CONTACT_REQUEST_CODE);
-            return true;
-        }
-        if(id == R.id.sortName){
-            ContactDbHelper mDbHelper = new ContactDbHelper(this);
-            mDbHelper.toggleSorting();
-            ContactListFragment fragment;
-            if (!mTwoPane){
-                fragment = (ContactListFragment) getFragmentManager().
-                        findFragmentById(R.id.contact_single_list);
+        switch (item.getItemId()){
+            case R.id.addContact:
+                Intent addContactIntent = new Intent(this, EditContactActivity.class);
+                addContactIntent.putExtra(REQUEST_CODE, NEW_CONTACT_REQUEST_CODE);
+                startActivityForResult(addContactIntent, NEW_CONTACT_REQUEST_CODE);
+                break;
+            case R.id.sortName:
+                ContactDbHelper contactDbHelper = new ContactDbHelper(this);
+                contactDbHelper.toggleSorting();
+                ContactListFragment fragment;
+                if (!mTwoPane){
+                    fragment = (ContactListFragment) getFragmentManager().
+                            findFragmentById(R.id.contact_single_list);
 
-            }else{
-                fragment = (ContactListFragment) getFragmentManager().
-                        findFragmentById(R.id.contact_list);
-            }
-            fragment.updateList();
-
+                }else{
+                    fragment = (ContactListFragment) getFragmentManager().
+                            findFragmentById(R.id.contact_list);
+                }
+                fragment.updateList();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -138,13 +129,12 @@ public class ContactListActivity extends Activity implements
     /**
      * If the requestcode is DETAIL_REQUEST_CODE and  ResultCode == Result_OK
      * Check the MODE_CODE sent with putExtra
-     *
-     *  If mode is LANDSCAPE:
+     * If mode is LANDSCAPE:
      * Create new Bundle named arguments,
-     * save the position with putString
+     * save the id with putString
      * Create a new DetailFragment and call setArgument with the bundle.
      * Then call fragmentmanager, begintransaction and replace.
-     * We call replace cause we want to show the current position.
+     * We call replace cause we want to show the current contact.
      * And finally call commit()
      *
      * @param requestCode
@@ -157,7 +147,6 @@ public class ContactListActivity extends Activity implements
                 switch (data.getIntExtra(MODE_CODE, 0)){
                     case LANDSCAPE_CODE:
                         Bundle arguments = new Bundle();
-                        arguments.putInt(CONTACT_POSITION_CODE, data.getIntExtra(CONTACT_POSITION_CODE,0));
                         arguments.putInt(CONTACT_ID_CODE, data.getIntExtra(CONTACT_ID_CODE,0));
                         ContactDetailFragment fragment = new ContactDetailFragment();
                         fragment.setArguments(arguments);

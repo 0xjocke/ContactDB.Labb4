@@ -20,25 +20,37 @@ import static se.bachstatter.contactdblabb4.activity.ContactListActivity.*;
 
 public class ContactDetailFragment extends Fragment {
     private Contact contact;
-    ContactDbHelper mDbHelper;
+    ContactDbHelper contactDbHelper;
     int contactId;
 
 
     /**
-     *
+     * If arguments contain key CONTACT_ID_CODE
+     * get the chosen contact with the help of ContactDBHelper
+     * and set the contact to the contact class variable.
      * @param savedInstanceState
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(CONTACT_POSITION_CODE) &&
-                getArguments().containsKey(CONTACT_ID_CODE)) {
-            mDbHelper = new ContactDbHelper(getActivity());
+        if (getArguments().containsKey(CONTACT_ID_CODE)) {
+            contactDbHelper = new ContactDbHelper(getActivity());
             contactId = getArguments().getInt(CONTACT_ID_CODE);
-            contact = mDbHelper.getItem(contactId);
+            contact = contactDbHelper.getItem(contactId);
         }
     }
 
+    /**
+     * Inflate the layout with the  view
+     * if contact is not null
+     * Fill the textviews with the contacts get methods.
+     * Convert the imgurl to bitmap and set it to imageviewe with the help of picasso.
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
