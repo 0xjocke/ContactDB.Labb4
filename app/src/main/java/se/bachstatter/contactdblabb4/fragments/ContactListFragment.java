@@ -24,7 +24,6 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     ContactDbHelper contactDbHelper;
     Cursor contactCursor;
     public ContactAdapter contactAdapter;
-    private static final int FIRST_ITEM = 0;
     private Callbacks mCallbacks;
     int currentIdForDialog;
     int mActivatedId = ListView.NO_ID;

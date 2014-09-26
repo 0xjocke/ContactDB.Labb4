@@ -25,7 +25,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
     private EditText imgUrlEditText;
     private Contact contact;
     private int contactId;
-    ContactDbHelper mDbHelper;
+    ContactDbHelper contactDbHelper;
 
     /**
      * Errormessage constant
@@ -46,12 +46,12 @@ public class EditContactActivity extends Activity implements View.OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_contact);
         initializeVariables();
-        mDbHelper = new ContactDbHelper(this);
+        contactDbHelper = new ContactDbHelper(this);
         int requestCode = getIntent().getExtras().getInt(REQUEST_CODE);
         if (requestCode == EDIT_CONTACT_REQUEST_CODE) {
 
             contactId = getIntent().getIntExtra(ContactListActivity.CONTACT_ID_CODE, 0);
-            contact = mDbHelper.getItem(contactId);
+            contact = contactDbHelper.getItem(contactId);
             fillTextFields();
             setEditBtnListener();
         }
@@ -132,7 +132,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
             contact.setAge(intAge);
             contact.setImgUrl(imgUrl);
             contact.setDescription(description);
-            mDbHelper.update(contact, contactId);
+            contactDbHelper.update(contact, contactId);
             setResult(RESULT_OK, getIntent());
             finish();
         }
@@ -154,7 +154,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
         if (validateFields(name, description, age, imgUrl)) {
             int intAge = Integer.parseInt(age);
             Contact contact = new Contact(imgUrl, name, description, intAge);
-            mDbHelper.insert(contact);
+            contactDbHelper.insert(contact);
             setResult(RESULT_OK, getIntent());
             finish();
         }

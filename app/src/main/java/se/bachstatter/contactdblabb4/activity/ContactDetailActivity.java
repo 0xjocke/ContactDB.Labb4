@@ -28,6 +28,10 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
      * Code constants
      */
     public static final int EDIT_CONTACT_REQUEST_CODE = 234 ;
+    /**
+     * Class variables
+     */
+    ContactDbHelper contactDbHelper;
 
     /**
      * If orientation is landscape:
@@ -49,6 +53,7 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contactDbHelper = new ContactDbHelper(this);
         setContentView(R.layout.activity_contact_detail);
         if (getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
@@ -130,7 +135,6 @@ public class ContactDetailActivity extends Activity implements DialogInterface.O
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            ContactDbHelper contactDbHelper = new ContactDbHelper(this);
             contactDbHelper.delete(getIntent().getIntExtra(CONTACT_ID_CODE, 0));
             setResult(RESULT_OK, getIntent());
             finish();

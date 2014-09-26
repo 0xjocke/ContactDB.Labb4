@@ -29,8 +29,8 @@ public class ContactDbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_WHERE_END = "=?";
     private static final String SORT_ASC = " ASC";
     private static final String DATABASE_NAME = "ContactsDb.db";
-    private static final int DATABASE_VERSION = 5;
-    private static boolean SORT_ON_NAME = false ;
+    private static final int DATABASE_VERSION = 1;
+    private static boolean SORT_ON_NAME = false;
 
 
     /**

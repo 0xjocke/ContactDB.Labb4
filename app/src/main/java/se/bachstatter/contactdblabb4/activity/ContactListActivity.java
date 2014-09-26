@@ -18,6 +18,8 @@ public class ContactListActivity extends Activity implements
      * Variable for checking if two pane layout is active.
      */
     private boolean mTwoPane;
+    ContactDbHelper contactDbHelper;
+
 
     /**
      * Request and Code Constants
@@ -39,6 +41,8 @@ public class ContactListActivity extends Activity implements
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        contactDbHelper = new ContactDbHelper(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
         if (findViewById(R.id.contact_detail_container) != null) {
@@ -109,7 +113,6 @@ public class ContactListActivity extends Activity implements
                 startActivityForResult(addContactIntent, NEW_CONTACT_REQUEST_CODE);
                 break;
             case R.id.sortName:
-                ContactDbHelper contactDbHelper = new ContactDbHelper(this);
                 contactDbHelper.toggleSorting();
                 ContactListFragment fragment;
                 if (!mTwoPane){
