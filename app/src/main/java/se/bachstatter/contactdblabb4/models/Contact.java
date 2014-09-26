@@ -10,7 +10,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 
-public class Contact implements Parcelable {
+public class Contact {
     /**
      * Class variables
      */
@@ -19,19 +19,31 @@ public class Contact implements Parcelable {
     private String name;
     private int age;
 
-
+    /**
+     * Setter for imgUrl
+     * @param imgUrl
+     */
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
-
+    /**
+     * Setter for Description
+     * @param description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
-
+    /**
+     * Setter for Name
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
-
+    /**
+     * Setter for Age
+     * @param age
+     */
     public void setAge(int age) {
         this.age = age;
     }
@@ -51,19 +63,6 @@ public class Contact implements Parcelable {
         this.description = description;
         this.name = name;
         this.age = age;
-    }
-
-    /**
-     * Parcable constructor
-     * Takes a Parcel and sets the values to classvariables
-     *
-     * @param in
-     */
-    private Contact(Parcel in) {
-        imgUrl = in.readString();
-        name = in.readString();
-        description = in.readString();
-        age = in.readInt();
     }
 
     /**
@@ -95,26 +94,4 @@ public class Contact implements Parcelable {
         return age;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.imgUrl);
-        dest.writeString(this.name);
-        dest.writeString(this.description);
-        dest.writeInt(this.age);
-    }
-    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
-        public Contact createFromParcel(Parcel in) {
-            return new Contact(in);
-        }
-
-        public Contact[] newArray(int size) {
-            return new Contact[size];
-        }
-    };
 }

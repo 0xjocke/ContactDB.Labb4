@@ -184,7 +184,7 @@ public class ContactDbHelper extends SQLiteOpenHelper {
      * @param id
      * @return Contact
      */
-    public Contact getItem(int id) {
+    public Contact getContact(int id) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 ContactEntry.TABLE_NAME,                  // The table to query

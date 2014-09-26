@@ -51,7 +51,7 @@ public class EditContactActivity extends Activity implements View.OnClickListene
         if (requestCode == EDIT_CONTACT_REQUEST_CODE) {
 
             contactId = getIntent().getIntExtra(ContactListActivity.CONTACT_ID_CODE, 0);
-            contact = contactDbHelper.getItem(contactId);
+            contact = contactDbHelper.getContact(contactId);
             fillTextFields();
             setEditBtnListener();
         }

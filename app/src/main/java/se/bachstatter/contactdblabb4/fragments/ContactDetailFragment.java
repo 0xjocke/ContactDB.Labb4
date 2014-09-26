@@ -36,7 +36,7 @@ public class ContactDetailFragment extends Fragment {
         if (getArguments().containsKey(CONTACT_ID_CODE)) {
             contactDbHelper = new ContactDbHelper(getActivity());
             contactId = getArguments().getInt(CONTACT_ID_CODE);
-            contact = contactDbHelper.getItem(contactId);
+            contact = contactDbHelper.getContact(contactId);
         }
     }
 
