@@ -178,8 +178,7 @@ public class ContactDbHelper extends SQLiteOpenHelper {
      * Run query on db with the table name, our static projection and set columns for where to _ID
      * and values for where clause to id
      *
-     * if cursor getCount / if we find any result:
-     * Run movetofirst on cursor. Get all values from cursor, create a contact and return it.
+     * If movetofirst is true. Get all values from cursor, create a contact and return it.
      * else retrun null.
      *
      * @param id
@@ -196,8 +195,7 @@ public class ContactDbHelper extends SQLiteOpenHelper {
                 null,                                     // don't filter by row groups
                 null                                      // The sort order
         );
-        if (cursor.getCount() >0) {
-            cursor.moveToFirst();
+        if (cursor.moveToFirst()) {
             return new Contact(
                     cursor.getString(cursor.getColumnIndex(ContactEntry.COLUMN_NAME_IMG_URL)),
                     cursor.getString(cursor.getColumnIndex(ContactEntry.COLUMN_NAME_NAME)),
@@ -248,8 +246,7 @@ public class ContactDbHelper extends SQLiteOpenHelper {
      * @return String[]
      */
     private String[] idToArray(int id){
-        String[] idAsArray = {String.valueOf(id)};
-        return idAsArray;
+        return new String[] {String.valueOf(id)};
     }
 
     /**

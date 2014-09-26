@@ -7,12 +7,9 @@ package se.bachstatter.contactdblabb4.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListFragment;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -20,12 +17,11 @@ import android.widget.ListView;
 import se.bachstatter.contactdblabb4.R;
 import se.bachstatter.contactdblabb4.adapters.ContactAdapter;
 import se.bachstatter.contactdblabb4.data.ContactDbHelper;
-import se.bachstatter.contactdblabb4.models.Contact;
 
 import static se.bachstatter.contactdblabb4.activity.ContactListActivity.*;
 
 public class ContactListFragment extends ListFragment implements AdapterView.OnItemLongClickListener, DialogInterface.OnClickListener {
-    ContactDbHelper mDbHelper;
+    ContactDbHelper contactDbHelper;
     Cursor contactCursor;
     public ContactAdapter contactAdapter;
     private static final int FIRST_ITEM = 0;
@@ -53,8 +49,8 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDbHelper = new ContactDbHelper(getActivity());
-        contactCursor = mDbHelper.get();
+        contactDbHelper = new ContactDbHelper(getActivity());
+        contactCursor = contactDbHelper.get();
         contactAdapter = new ContactAdapter(getActivity(), contactCursor, false);
         setListAdapter(contactAdapter);
     }
@@ -64,7 +60,7 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
      * If savedInstance is null and we are in landscape: show first item
      *
      * if savedInstance is null and it containsKey CONTACT_ID_CODE:
-     * run setActivatedPosition  CONTACT_ID_CODE
+     * run setActivatedId  CONTACT_ID_CODE
      *
      * @param view
      * @param savedInstanceState
@@ -74,27 +70,30 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
         super.onViewCreated(view, savedInstanceState);
         setLongClickListener();
         if (savedInstanceState != null && savedInstanceState.containsKey(CONTACT_ID_CODE)) {
-            setActivatedPosition(savedInstanceState.getInt(CONTACT_ID_CODE));
+            setActivatedId(savedInstanceState.getInt(CONTACT_ID_CODE));
         }
     }
 
+    /**
+     * onResume run updateList
+     */
     @Override
     public void onResume() {
         super.onResume();
-        contactCursor = mDbHelper.get();
-        contactAdapter.changeCursor(contactCursor);
-        contactAdapter.notifyDataSetChanged();
+        updateList();
     }
-
+    /**
+     *  Update the list, by running get on dbhelper, change the cursor and
+     * notify the adapter
+     */
     public void updateList(){
-        contactCursor = mDbHelper.get();
+        contactCursor = contactDbHelper.get();
         contactAdapter.changeCursor(contactCursor);
         contactAdapter.notifyDataSetChanged();
     }
 
     /**
      * Sets OnItemLongClickListener on listview.
-     *
      */
     private void setLongClickListener() {
         ListView listView = getListView();
@@ -159,18 +158,27 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
     }
 
     /**
-     * Sets the checked state of ListView the specified position.
-     * Also saves teh position to mActivatedPosition
+     *  Saves the id to mActivatedId
      * @param id
      */
-    private void setActivatedPosition(int id) {
-       //TODO might need position here
-       // getListView().setItemChecked(position, true);
+    private void setActivatedId(int id) {
         mActivatedId = id;
     }
 
+    /**
+     *
+     * On item long click
+     * save id to currentIdForDialog.
+     * Create a new alertdialog with AlertDialog builder.
+     * set message, title, positivebtn and negative. btn.
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     * @return
+     */
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         currentIdForDialog = (int)id;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.dialog_message)
@@ -182,11 +190,17 @@ public class ContactListFragment extends ListFragment implements AdapterView.OnI
         return true;
     }
 
+    /**
+     * Onclick on positivebtn remove the cosen contact and notify the adapter
+     * on both negative and positive click dismiss the dialog.
+     * @param dialog
+     * @param which
+     */
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            mDbHelper.delete(currentIdForDialog);
-            contactCursor = mDbHelper.get();
+            contactDbHelper.delete(currentIdForDialog);
+            contactCursor = contactDbHelper.get();
             contactAdapter.changeCursor(contactCursor);
             contactAdapter.notifyDataSetChanged();
         }
